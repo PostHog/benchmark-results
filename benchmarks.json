@@ -1,0 +1,53 @@
+{
+    "benchmarks.QuerySuite.track_trends_event_property_filter": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_trends_event_property_filter(self):\n        filter = Filter(\n            data={\n                \"events\": [{\"id\": \"$pageview\"}],\n                \"properties\": [\n                    {\n                        \"key\": \"$host\",\n                        \"operator\": \"is_not\",\n                        \"value\": [\n                            \"localhost:8000\",\n                            \"localhost:5000\",\n                            \"127.0.0.1:8000\",\n                            \"127.0.0.1:3000\",\n                            \"localhost:3000\",\n                        ],\n                    }\n                ],\n                **SHORT_DATE_RANGE,\n            }\n        )\n    \n        with no_materialized_columns():\n            ClickhouseTrends().run(filter, self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team",
+        "name": "benchmarks.QuerySuite.track_trends_event_property_filter",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "1c205fc19a16dcd1b35fbb5357374de32126c2e6787698394378eb47290c4758"
+    },
+    "benchmarks.QuerySuite.track_trends_event_property_filter_materialized": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_trends_event_property_filter_materialized(self):\n        filter = Filter(\n            data={\n                \"events\": [{\"id\": \"$pageview\"}],\n                \"properties\": [\n                    {\n                        \"key\": \"$host\",\n                        \"operator\": \"is_not\",\n                        \"value\": [\n                            \"localhost:8000\",\n                            \"localhost:5000\",\n                            \"127.0.0.1:8000\",\n                            \"127.0.0.1:3000\",\n                            \"localhost:3000\",\n                        ],\n                    }\n                ],\n                **DATE_RANGE,\n            }\n        )\n        ClickhouseTrends().run(filter, self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team",
+        "name": "benchmarks.QuerySuite.track_trends_event_property_filter_materialized",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "2a97881d2f27fd476fa7ccb5c51a6f52852b04a4daa9a11e7ef3d98dd3a45ea2"
+    },
+    "benchmarks.QuerySuite.track_trends_no_filter": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_trends_no_filter(self):\n        filter = Filter(data={\"events\": [{\"id\": \"$pageview\"}], **DATE_RANGE})\n        ClickhouseTrends().run(filter, self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team",
+        "name": "benchmarks.QuerySuite.track_trends_no_filter",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "4307552f7c5714709f32f6cfe91d5bee922dd72a397bfeb2a5813d239c538be2"
+    },
+    "benchmarks.QuerySuite.track_trends_person_property_filter": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_trends_person_property_filter(self):\n        filter = Filter(\n            data={\n                \"events\": [{\"id\": \"$pageview\"}],\n                \"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}],\n                **DATE_RANGE,\n            }\n        )\n    \n        with no_materialized_columns():\n            ClickhouseTrends().run(filter, self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team",
+        "name": "benchmarks.QuerySuite.track_trends_person_property_filter",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "c4049d4316a1424745f0bffcbdcbd5871a3f5404c4b9eb391d50c6d641cb95ad"
+    },
+    "benchmarks.QuerySuite.track_trends_person_property_filter_materialized": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_trends_person_property_filter_materialized(self):\n        filter = Filter(\n            data={\n                \"events\": [{\"id\": \"$pageview\"}],\n                \"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}],\n                **DATE_RANGE,\n            }\n        )\n    \n        ClickhouseTrends().run(filter, self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team",
+        "name": "benchmarks.QuerySuite.track_trends_person_property_filter_materialized",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "0e6e75d466a595ee5a022517424c014277e634dce4b6f2f0b220948b58d93a1f"
+    },
+    "version": 2
+}
