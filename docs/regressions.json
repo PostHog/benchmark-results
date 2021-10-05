@@ -1,1 +1,1 @@
-{"regressions": []}
+{"regressions": [["benchmarks.QuerySuite.track_trends_event_property_filter", "graphs/arch-null/branch-HEAD/cpu-null/machine-ci-benchmarks/num_cpu-null/os-null/python-3.8/ram-null/benchmarks.QuerySuite.track_trends_event_property_filter.json", {}, null, 20242.5, 18777.0, [[6815, 6821, 18777.0, 20242.5]]]]}
