@@ -1,1 +1,1 @@
-{"regressions": [["benchmarks.QuerySuite.track_trends_filter_by_action_with_person_filters_materialized", "graphs/arch-null/branch-HEAD/cpu-null/machine-ci-benchmarks/num_cpu-null/os-null/python-3.8/ram-null/benchmarks.QuerySuite.track_trends_filter_by_action_with_person_filters_materialized.json", {}, null, 6113.0, 5774.0, [[7678, 7757, 5774.0, 6113.0]]]]}
+{"regressions": []}
