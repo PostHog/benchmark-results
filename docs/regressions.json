@@ -1,1 +1,1 @@
-{"regressions": [["benchmarks.QuerySuite.track_earliest_timestamp", "graphs/arch-null/branch-HEAD/cpu-null/machine-ci-benchmarks/num_cpu-null/os-null/python-3.8/ram-null/benchmarks.QuerySuite.track_earliest_timestamp.json", {}, null, 868.0, 816.5, [[null, 8329, 816.5, 868.0]]]]}
+{"regressions": []}
