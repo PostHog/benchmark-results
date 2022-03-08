@@ -59,6 +59,26 @@
         "unit": "unit",
         "version": "v001"
     },
+    "benchmarks.QuerySuite.track_event_property_values": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_event_property_values(self):\n        with no_materialized_columns():\n            get_property_values_for_key(\"$browser\", self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team\n    \n        cohort = Cohort.objects.filter(name=\"benchmarking cohort\").first()\n        if cohort is None:\n            cohort = Cohort.objects.create(\n                team_id=2,\n                name=\"benchmarking cohort\",\n                groups=[{\"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}]}],\n            )\n            cohort.calculate_people_ch(pending_version=0)\n        self.cohort = cohort",
+        "name": "benchmarks.QuerySuite.track_event_property_values",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "v001"
+    },
+    "benchmarks.QuerySuite.track_event_property_values_materialized": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_event_property_values_materialized(self):\n        get_property_values_for_key(\"$browser\", self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team\n    \n        cohort = Cohort.objects.filter(name=\"benchmarking cohort\").first()\n        if cohort is None:\n            cohort = Cohort.objects.create(\n                team_id=2,\n                name=\"benchmarking cohort\",\n                groups=[{\"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}]}],\n            )\n            cohort.calculate_people_ch(pending_version=0)\n        self.cohort = cohort",
+        "name": "benchmarks.QuerySuite.track_event_property_values_materialized",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "v001"
+    },
     "benchmarks.QuerySuite.track_funnel_normal": {
         "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_funnel_normal(self):\n        filter = Filter(\n            data={\n                \"insight\": \"FUNNELS\",\n                \"events\": [{\"id\": \"user signed up\", \"order\": 0}, {\"id\": \"insight analyzed\", \"order\": 1}],\n                **DATE_RANGE,\n            },\n            team=self.team,\n        )\n        ClickhouseFunnel(filter, self.team).run()\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team\n    \n        cohort = Cohort.objects.filter(name=\"benchmarking cohort\").first()\n        if cohort is None:\n            cohort = Cohort.objects.create(\n                team_id=2,\n                name=\"benchmarking cohort\",\n                groups=[{\"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}]}],\n            )\n            cohort.calculate_people_ch(pending_version=0)\n        self.cohort = cohort",
         "name": "benchmarks.QuerySuite.track_funnel_normal",
@@ -112,6 +132,26 @@
     "benchmarks.QuerySuite.track_lifecycle_person_property_filter_materialized": {
         "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_lifecycle_person_property_filter_materialized(self):\n        filter = Filter(\n            data={\n                \"insight\": \"LIFECYCLE\",\n                \"events\": [{\"id\": \"$pageview\", \"type\": \"events\"}],\n                \"interval\": \"week\",\n                \"shown_as\": \"Lifecycle\",\n                \"date_from\": \"-14d\",\n                \"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}],\n                **DATE_RANGE,\n            },\n            team=self.team,\n        )\n    \n        ClickhouseTrends().run(filter, self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team\n    \n        cohort = Cohort.objects.filter(name=\"benchmarking cohort\").first()\n        if cohort is None:\n            cohort = Cohort.objects.create(\n                team_id=2,\n                name=\"benchmarking cohort\",\n                groups=[{\"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}]}],\n            )\n            cohort.calculate_people_ch(pending_version=0)\n        self.cohort = cohort",
         "name": "benchmarks.QuerySuite.track_lifecycle_person_property_filter_materialized",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "v001"
+    },
+    "benchmarks.QuerySuite.track_person_property_values": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_person_property_values(self):\n        with no_materialized_columns():\n            get_person_property_values_for_key(\"$browser\", self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team\n    \n        cohort = Cohort.objects.filter(name=\"benchmarking cohort\").first()\n        if cohort is None:\n            cohort = Cohort.objects.create(\n                team_id=2,\n                name=\"benchmarking cohort\",\n                groups=[{\"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}]}],\n            )\n            cohort.calculate_people_ch(pending_version=0)\n        self.cohort = cohort",
+        "name": "benchmarks.QuerySuite.track_person_property_values",
+        "param_names": [],
+        "params": [],
+        "timeout": 3000.0,
+        "type": "track",
+        "unit": "unit",
+        "version": "v001"
+    },
+    "benchmarks.QuerySuite.track_person_property_values_materialized": {
+        "code": "class QuerySuite:\n    @benchmark_clickhouse\n    def track_person_property_values_materialized(self):\n        get_person_property_values_for_key(\"$browser\", self.team)\n\n    def setup(self):\n        for table, property in MATERIALIZED_PROPERTIES:\n            if property not in get_materialized_columns(table):\n                materialize(table, property)\n                backfill_materialized_columns(table, [property], backfill_period=timedelta(days=1_000))\n    \n        # :TRICKY: Data in benchmark servers has ID=2\n        team = Team.objects.filter(id=2).first()\n        if team is None:\n            organization = Organization.objects.create()\n            team = Team.objects.create(id=2, organization=organization, name=\"The Bakery\")\n        self.team = team\n    \n        cohort = Cohort.objects.filter(name=\"benchmarking cohort\").first()\n        if cohort is None:\n            cohort = Cohort.objects.create(\n                team_id=2,\n                name=\"benchmarking cohort\",\n                groups=[{\"properties\": [{\"key\": \"email\", \"operator\": \"icontains\", \"value\": \".com\", \"type\": \"person\"}]}],\n            )\n            cohort.calculate_people_ch(pending_version=0)\n        self.cohort = cohort",
+        "name": "benchmarks.QuerySuite.track_person_property_values_materialized",
         "param_names": [],
         "params": [],
         "timeout": 3000.0,
